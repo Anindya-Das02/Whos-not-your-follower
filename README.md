@@ -29,4 +29,8 @@ Even though the entire web scraping is fully automated. But if your account is p
   ```
   > pip install lxml
   ```
-
+  
+# ScreenShots
+![image 1](https://i.imgur.com/jg5SL8u.png)  
+![image 2](https://i.imgur.com/fBr80Vz.png)  
+![image 3](https://i.imgur.com/b51XvZo.png)
