@@ -1,7 +1,8 @@
 from selenium import webdriver
-from time import sleep
+from time import *
 import requests
 from bs4 import BeautifulSoup
+import getpass
 
 """
 creator: Anindya Das
@@ -37,13 +38,36 @@ def checkForIncorrectAccountCredentials(driver):
 		pass
 	return False
 
+# save the usernames of non-followers in a text (.txt) file
+# file created in present directory
+def savefile(array):
+    print()
+    choice = input("save non-followers list as a .txt file? (y/n): ")
+    if(choice.lower() == 'y'):
+        array = [f'{i}\n' for i in array]
+        file_name = 'non-followers-insta.' +  str(time())[:-4] + '.txt'
+        try:
+            f = open(file_name,'a')
+            f.writelines(array)
+            print("file created!")
+            f.close()
+        except:
+            print("an error occured while creating the file!")
+    elif(choice.lower() == 'n'):
+        print("not saving non-followers list")
+    else:
+        print("invalid input!")
+        savefile(array)
+
 
 url = "https://www.instagram.com/"
 
 print("*********** WHO'S NOT YOUR FOLLOWER? ***************")
+
 print("please enter your instagram credentials below:")
 username_ip = input("username/email/phn: ")
-password_ip = input("password: ")
+#password_ip = input("password: ")
+password_ip = getpass.getpass("password (hidden): ")
 
 driver = webdriver.Chrome()
 driver.get(url)
@@ -92,10 +116,13 @@ print("logged in...")
 #======================================
 # checking for pop up [turn notificatio on]
 # clicking 'not now' option
-if(modalPresent(driver)):
-    print("pop up visible")
-    driver.find_element_by_xpath("""/html/body/div[4]/div/div/div[3]/button[2]""").click()
-    print("notification pop up -> [not now] clicked")
+try:
+    if(modalPresent(driver)):
+        print("pop up visible")
+        driver.find_element_by_xpath("""/html/body/div[4]/div/div/div[3]/button[2]""").click()
+        print("notification pop up -> [not now] clicked")
+except:
+    pass
 
 # pop-up handler finish
 #=====================================
@@ -129,7 +156,7 @@ driver.find_element_by_xpath("""/html/body/div[4]/div/div[1]/div/div[2]/button""
 wait(3,7)
 
 #===================================
-# fetching lost of following
+# fetching list of following
 
 driver.find_element_by_xpath("""/html/body/div[1]/section/main/div/header/section/ul/li[3]/a""").click()
 wait(3,8)
@@ -188,7 +215,12 @@ print(f"no. of following: {len(following_set)}")
 print()
 
 if(len(followers_set ) > len(following_set)):
-    print("wow! you have more followers than following!")
+    print("WOW! you have more followers than following!")
+    diff_set = following_set - followers_set
+    diff_list = sorted(list(diff_set))
+    print(f"{len(diff_list)} people who are not following you are:")
+    for i in diff_list:
+        print(f"\t{i}") 
 else:
     diff_set = following_set - followers_set
     diff_list = sorted(list(diff_set))
@@ -196,7 +228,11 @@ else:
     for i in diff_list:
         print(f"\t{i}")
 
+sleep(2)
+savefile(diff_list)
+
+print()
+print("closing browser...")
 sleep(3)
 driver.close()
-print()
 print("==== FIN ====")
